@@ -14,7 +14,7 @@ In order to follow this tutorial you will need:
 
 ## Project setup
 
-Start off by creating a new Laravel project for your application. This can be done either by using the [Laravel installer](https://laravel.com/docs/6.x#installing-laravel) or Composer. For this tutorial, the Laravel installer will be used. If you don't have the Laravel installer already installed, head over to the [Laravel documentation](https://laravel.com/docs/6.x#installing-laravel) to see how to. If you already do then open up a terminal and run the following command to create a new Laravel project:
+Start off by creating a new Laravel project for your application. This can be done either by using the [Laravel installer](https://laravel.com/docs/6.x#installing-laravel) or Composer. For this tutorial, the Laravel installer will be used. If you don't have the Laravel installer already installed, head over to the [Laravel documentation](https://laravel.com/docs/6.x#installing-laravel) to see how to. If installed, open up a terminal and run the following command to create a new Laravel project:
 
     $ laravel new periodic-emails
 
@@ -22,7 +22,7 @@ Next, you need to install the [Sendgrid PHP Library](https://github.com/sendgrid
 
     $ composer require "sendgrid/sendgrid"
 
-After sucessful installation of the SendGrid library, head to your [SendGrid dashboard](https://app.sendgrid.com/settings/api_keys) to retrieve your API key which will be used to authenticate requests made with the library.
+After sucessful installation of the SendGrid library, head to your [SendGrid dashboard](https://app.sendgrid.com/settings/api_keys) to retrieve your API key, which will be used to authenticate requests made with the library.
 
 ![https://res.cloudinary.com/brianiyoha/image/upload/v1575608996/Articles%20sample/Group_13.png](https://res.cloudinary.com/brianiyoha/image/upload/v1575608996/Articles%20sample/Group_13.png)
 
@@ -38,9 +38,9 @@ Next, open up your `.env` file to add your API key to your environmental variabl
 
 ## Setting up Database
 
-The next step is to set up your database for the application. This tutorial will make use of the [MySQL](https://www.mysql.com/) database. If you don't already have it installed on your local machine, head over to their [official download page](https://www.mysql.com/downloads/) to have it downloaded and installed.
+The next step is to set up your database for the application. This tutorial will make use of the [MySQL](https://www.mysql.com/) database. If you don't already have it installed on your local machine, head over to their [official download page](https://www.mysql.com/downloads/) to download and install.
 
-To create a database for your application, you will need to login to the MySQL client. To do this, simply run the following command:
+To create a database for your application, you will need to login to the MySQL client. To do this, simply run the following command in your terminal:
 
     $ mysql -u {your_user_name}
 
@@ -69,18 +69,18 @@ This will create a `users` table in your database alongside the listed fields in
 
 ### Seeding the Users Table
 
-As mentioned earlier, you will need some sample user(s) data to actually send out emails to. You can easily seed your database with *fake* data by using [seeders](https://laravel.com/docs/6.x/seeding). To generate a seeder class, open up a terminal in your project directory and run the following command:
+As mentioned earlier, you will need some sample user(s) data to actually send emails to. You can easily seed your database with *fake* data by using [seeders](https://laravel.com/docs/6.x/seeding). To generate a *Seeder* class, open up a terminal in your project directory and run the following command:
 
     $ php artisan make:seeder UsersTableSeeder
 
-This will generate a `UsersTableSeeder` seeder class in `database/seeds/`. Open the newly created file ( `database/seeds/UsersTableSeeder.php` ) and make the following changes:
+This will generate a `UsersTableSeeder` seeder class in `database/seeds/`. Open the newly created file ( `database/seeds/UsersTableSeeder.php`) and make the following changes:
 
     <?php
     
-    use Illuminate\\Database\\Seeder;
-    use Illuminate\\Support\\Facades\\DB;
-    use Faker\\Generator as Faker;
-    use Illuminate\\Support\\Facades\\Hash;
+    use Illuminate\Database\Seeder;
+    use Illuminate\Support\Facades\DB;
+    use Faker\Generator as Faker;
+    use Illuminate\Support\Facades\Hash;
     
     class UsersTableSeeder extends Seeder
     {
@@ -128,7 +128,7 @@ First, create a new artisan command by running the following command in your ter
 
     $ php artisan make:command SendMails
 
-This will generate a new Console command class in `app/Console/Commands/SendMails.php`, this file will house the needed logic for sending out emails via SendGrid. Now open the just created SendMails file and make the following changes:
+This will generate a new Console command class in `app/Console/Commands/SendMails.php`. This file will house the needed logic for sending out emails via SendGrid. Now open the just newly creeated *SendMails* file and make the following changes:
 
     <?php
     
@@ -208,13 +208,15 @@ This will generate a new Console command class in `app/Console/Commands/SendMail
         }
     }
 
-As you would see, there are two properties and a method already present in the class namely `$signature` , `$description` and the `handle()` method. The `$signature` property is used to identify the *command* from the artisan console, so in this case to run this command you will have to do something like: 
+**NOTE:** *Be sure to add the MAIL_FROM_ADDRESS env variable with the approved sender email from your SendGrid account.*
+
+At creation, there are two properties and a method already present in the class; `$signature`, `$description`, and the `handle()` method. The `$signature` property is used to identify the *command* from the artisan console. In this case, to run this command you will have to do something like: 
 
     $ php artisan sendmails:send
 
-while the `$description` property just like the name indicates is used to describe this command when the `artisan list` command is executed while the `handle()` method is called whenever the `sendmails:send` command is executed.
+The `$description` property, as the name indicates, is used to describe this command when the `artisan list` command is executed, while the `handle()` method is called whenever the `sendmails:send` command is executed.
 
-The `handle()` method has in this case, is used to send out emails to all registered users using the SendGrid SDK. First, the needed data for sending out emails are prepared using the helper classes in the SendGrid SDK. Next, a new `Mail` object is created using the `SendGrid\Mail\Mail` class which takes in five (5) arguments namely `from`, `to`, `subject`, `plainTextContent`, `htmlContent` .
+The `handle()` method is used to send out emails to all registered users using the SendGrid SDK. First, the data needed for sending out emails is prepared using the helper classes in the SendGrid SDK. Next, a new `Mail` object is created using the `SendGrid\Mail\Mail` class which receives five (5) arguments, namely `from`, `to`, `subject`, `plainTextContent`, and `htmlContent`.
 
      $email = new SendGrid\Mail\Mail(
                 $from,
@@ -224,7 +226,7 @@ The `handle()` method has in this case, is used to send out emails to all regist
                 $htmlContent
             );
 
-You can see `null` is passed into the `to` parameter because this mail is meant to be sent to multiple users but also you don't want each user to know who else got the same mail. To ensure this mail is sent to each user individually, you have to make use of a `[personalization](https://sendgrid.com/docs/for-developers/sending-email/personalizations/)` object. A personalization object helps you create multiple options for each receiver of a mail.
+You can see `null` is passed into the `to` parameter because this mail is meant to be sent to multiple users while concealing who the other recipients are. To ensure this mail is sent to each user individually, you have to make use of a `[personalization](https://sendgrid.com/docs/for-developers/sending-email/personalizations/)` object. A personalization object helps you create multiple options for each receiver of an email.
 
      /* Get all registered users */
             $users = User::all();
@@ -235,7 +237,7 @@ You can see `null` is passed into the `to` parameter because this mail is meant 
                 $email->addPersonalization($personalization);
             }
 
-In this case, a  personalization object is created for each user and then added to the `Mail` object using the `addPersonalization` method available in the `Mail` class. Finally, The `$email`(Mail object) is then passed into the `send()` method from the SendGrid SDK which is used to send out the mails using the options set in the `Mail` object. 
+In this case, a personalization object is created for each user and then added to the `Mail` object using the `addPersonalization` method available in the `Mail` class. Finally, the `$email`(Mail object) is then passed into the `send()` method from the SendGrid SDK, which is used to send out the mails using the options set in the `Mail` object. 
 
 ### Scheduling The Command
 
@@ -284,7 +286,7 @@ At this point, you would have successfully created a custom artisan command to s
         }
     }
 
-The custom command (`sendmails:send`)  has been added to the `schedule()` method and is set to fire daily using the `daily()` [frequency option](https://laravel.com/docs/5.8/scheduling#schedule-frequency-options). Next, you need to register a cron job to run the scheduler every minute which will, in turn, run your scheduled tasks in the `shedule()` method. If you know how to add a cron job on your server then go ahead and add the following
+The custom command (`sendmails:send`) has been added to the `schedule()` method and is set to fire daily using the `daily()` [frequency option](https://laravel.com/docs/5.8/scheduling#schedule-frequency-options). Next, you need to register a cron job to run the scheduler every minute which will, in turn, run your scheduled tasks in the `shedule()` method. If you know how to add a cron job on your server then go ahead and add the following:
 
     * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 
@@ -292,7 +294,7 @@ The custom command (`sendmails:send`)  has been added to the `schedule()` method
 
     $ crontab -e
 
-This will open your server' crontab file, next add the following to the file:
+This will open your server's crontab file. Next add the following to the file:
 
     * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
 
@@ -328,7 +330,7 @@ You should get a mail after testing either of the steps.
 
 ## Conclusion
 
-Now that you have finished this tutorial, you have learned how to send out emails using Twilio SendGrid in a Laravel application while also learning how to build and schedule a custom artisan command. If you will like to take a look at the complete source code for this tutorial, you can find it on [Github.](https://github.com/thecodearcher/periodic-emails)
+Now that you have finished this tutorial, you have learned how to send out emails using Twilio SendGrid in a Laravel application, while also learning how to build and schedule a custom artisan command. If you would like to take a look at the complete source code for this tutorial, you can find it on [Github.](https://github.com/thecodearcher/periodic-emails)
 
 I’d love to answer any question(s) you might have concerning this tutorial. You can reach me via
 
